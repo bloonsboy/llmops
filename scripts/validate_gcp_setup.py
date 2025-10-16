@@ -1,6 +1,7 @@
 import os
 from google.cloud import aiplatform, storage
 
+
 def test_gcp_setup():
     project_id = os.getenv("GCP_PROJECT_ID")
     region = os.getenv("GCP_REGION")
