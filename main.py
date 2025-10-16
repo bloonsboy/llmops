@@ -1,35 +1,33 @@
 import os
 from google.cloud import aiplatform, storage
 
-
 def test_gcp_setup():
-    """Teste rapidement la configuration de Vertex AI et GCS."""
     project_id = os.getenv("GCP_PROJECT_ID")
     region = os.getenv("GCP_REGION")
     bucket_name = os.getenv("GCS_BUCKET_NAME")
 
     if not all([project_id, region, bucket_name]):
         print(
-            "Erreur : Définir les variables GCP_PROJECT_ID, GCP_REGION, et GCS_BUCKET_NAME."
+            "Error: Please set the GCP_PROJECT_ID, GCP_REGION, and GCS_BUCKET_NAME environment variables."
         )
         return
 
-    print(f"--- Test de la configuration pour le projet '{project_id}' ---")
+    print(f"--- Testing configuration for project '{project_id}' ---")
 
     try:
         aiplatform.init(project=project_id, location=region)
-        print("[SUCCÈS] Client Vertex AI initialisé.")
+        print("[SUCCESS] Vertex AI client initialized.")
     except Exception as e:
-        print(f"[ÉCHEC] Initialisation de Vertex AI : {e}")
+        print(f"[FAILURE] Vertex AI initialization: {e}")
         return
 
     try:
         storage.Client(project=project_id).get_bucket(bucket_name)
-        print(f"[SUCCÈS] Le bucket GCS '{bucket_name}' est accessible.")
+        print(f"[SUCCESS] GCS bucket '{bucket_name}' is accessible.")
     except Exception as e:
-        print(f"[ÉCHEC] Accès à GCS : {e}")
+        print(f"[FAILURE] GCS access: {e}")
 
-    print("--- Test terminé ---")
+    print("--- Test completed ---")
 
 
 if __name__ == "__main__":
