@@ -14,4 +14,5 @@ dependencies = [
     "ipykernel>=7.0.0",
     "kfp>=2.14.6",
     "pandas>=2.3.3",
+    "python-dotenv>=1.0.0",
 ]
