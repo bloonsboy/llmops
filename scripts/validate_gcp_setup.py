@@ -1,53 +1,51 @@
-import os
-from google.cloud import aiplatform
-from google.cloud import storage
-from google.api_core import exceptions
-import logging
-from dotenv import load_dotenv
-load_dotenv()
+from google.cloud import aiplatform, storage
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+from src.constants import (
+    BUCKET_NAME,
+    PROJECT_ID,
+    REGION,
+)
 
-def check_gcp_setup():
-    project_id = os.getenv("GCP_PROJECT_ID")
-    region = os.getenv("GCP_REGION")
-    bucket_name = os.getenv("GCP_BUCKET_NAME")
 
-    if not project_id or not region or not bucket_name:
-        logging.error("Please ensure GCP_PROJECT_ID, GCP_REGION, and GCP_BUCKET_NAME are set in your environment variables.")
-        return
-
-    logging.info("--- 1. Testing Vertex AI Connection ---")
+def validate_vertex_ai_connectivity() -> bool:
+    """Validate Vertex AI API connectivity."""
     try:
-        aiplatform.init(project=project_id, location=region)
-        logging.info("Vertex AI client initialized successfully.")
-        logging.info(f"Connected to project '{project_id}' in region '{region}'.\n")
-    except exceptions.PermissionDenied:
-        logging.error(f"Permission denied. The authenticated user/service account does not have the 'aiplatform.user' role on project '{project_id}'.")
-        return
-    except Exception as e:
-        logging.error(f"An unexpected error occurred while initializing Vertex AI: {e}\n")
-        return
+        aiplatform.init(project=PROJECT_ID, location=REGION)
+        print("✓ Vertex AI API connectivity successful")
+        return True
+    except Exception as error:
+        print(f"✗ Vertex AI API connectivity failed: {error}")
+        return False
 
-    logging.info("--- 2. Testing Google Cloud Storage Connection ---")
+
+def validate_bucket_access(bucket_name: str) -> bool:
+    """Validate access to a specific GCS bucket."""
     try:
-        storage_client = storage.Client(project=project_id)
-        bucket = storage_client.get_bucket(bucket_name)
-        logging.info(f"Successfully accessed bucket '{bucket_name}'.")
+        storage_client = storage.Client(project=PROJECT_ID)
+        bucket = storage_client.bucket(bucket_name)
+        bucket.reload()
+        print(f"✓ GCS bucket access successful: {bucket_name}")
+        return True
+    except Exception as error:
+        print(f"✗ GCS bucket access failed: {error}")
+        return False
 
-        blobs = list(storage_client.list_blobs(bucket, max_results=5))
-        logging.info(f"Found {len(blobs)} files in the bucket (listing up to 5).")
-        for blob in blobs:
-            logging.info(f"{blob.name}")
-        logging.info("GCS setup is correct.\n")
 
-    except exceptions.NotFound:
-        logging.error(f"Bucket '{bucket_name}' not found in project '{project_id}'. Please check the name.")
-    except exceptions.Forbidden as e:
-        logging.error(e)
-        # logging.error(f"Permission denied. The authenticated user/service account does not have the 'Storage Object Viewer' role for the bucket '{bucket_name}'.")
-    except Exception as e:
-        logging.error(f"An unexpected error occurred while accessing GCS: {e}\n")
+def run_all_validations() -> None:
+    """Run all validation checks and return overall success status."""
+    print("Running GCP setup validation...")
+    print("=" * 50)
+
+    validations = [
+        validate_vertex_ai_connectivity(),
+        validate_bucket_access(BUCKET_NAME) if BUCKET_NAME else False,
+    ]
+
+    if sum(validations) == len(validations):
+        print("✓ All validations passed! GCP setup is ready.")
+    else:
+        print("✗ Some validations failed. Please check your GCP configuration.")
+
 
 if __name__ == "__main__":
-    check_gcp_setup()
+    run_all_validations()
