@@ -8,7 +8,7 @@ PROJECT_ROOT_PATH = Path(__file__).parents[1]
 
 # GCP Configuration
 PROJECT_ID: str | None = os.getenv("GCP_PROJECT_ID")
-REGION: str = os.getenv("GCP_REGION", "europe-west2")
+REGION: str = os.getenv("GCP_REGION", "europe-west1")
 BUCKET_NAME: str | None = os.getenv("GCP_BUCKET_NAME")
 
 # Paths
