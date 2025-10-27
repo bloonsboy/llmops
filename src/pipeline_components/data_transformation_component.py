@@ -15,17 +15,17 @@ def data_transformation_component(
     train_dataset: OutputPath("Dataset"),  # type: ignore
     test_dataset: OutputPath("Dataset"),  # type: ignore
 ) -> None:
-    """Format and split Yoda Sentences for Phi-3 fine-tuning."""
+    """Formatte et divise le dataset Pirate (simplifié) pour le fine-tuning de Phi-3."""
     import logging
 
     import pandas as pd
     from datasets import Dataset
 
     def format_dataset_to_phi_messages(dataset: Dataset) -> Dataset:
-        """Format dataset to Phi messages structure."""
+        """Formate le dataset à la structure de messages de Phi."""
 
         def format_dataset(examples):
-            """Format a single example to Phi messages structure."""
+            """Formate un exemple unique à la structure de messages de Phi."""
             converted_sample = [
                 {"role": "user", "content": examples["prompt"]},
                 {"role": "assistant", "content": examples["completion"]},
@@ -33,27 +33,27 @@ def data_transformation_component(
             return {"messages": converted_sample}
 
         return (
-            dataset.rename_column("sentence", "prompt")
-            .rename_column("translation_extra", "completion")
+            dataset.rename_column("instruction", "prompt")
+            .rename_column("response", "completion")
             .map(format_dataset)
-            .remove_columns(["prompt", "completion", "translation"])
+            .remove_columns(["prompt", "completion"])
         )
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
-    logger.info("Starting data transformation process...")
+    logger.info("Démarrage du processus de transformation des données...")
 
-    logger.info(f"Reading from {raw_dataset_uri}")
+    logger.info(f"Lecture depuis {raw_dataset_uri}")
     dataset = Dataset.from_pandas(pd.read_csv(raw_dataset_uri))
 
-    logger.info("Formatting and splitting dataset...")
+    logger.info("Formatage et division du dataset...")
     formatted_dataset = format_dataset_to_phi_messages(dataset)
     split_dataset = formatted_dataset.train_test_split(test_size=train_test_split_ratio)
 
-    logger.info(f"Writing train dataset to {train_dataset}...")
+    logger.info(f"Écriture du dataset d'entraînement dans {train_dataset}...")
     split_dataset["train"].to_csv(train_dataset, index=False)
 
-    logger.info(f"Writing test dataset to {test_dataset}...")
+    logger.info(f"Écriture du dataset de test dans {test_dataset}...")
     split_dataset["test"].to_csv(test_dataset, index=False)
 
-    logger.info("Data transformation process completed successfully")
+    logger.info("Transformation des données terminée.")

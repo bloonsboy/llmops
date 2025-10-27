@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Paths
@@ -12,5 +13,5 @@ REGION: str = os.getenv("GCP_REGION", "europe-west1")
 BUCKET_NAME: str | None = os.getenv("GCP_BUCKET_NAME")
 
 # Paths
-RAW_DATASET_URI: str = f"gs://{BUCKET_NAME}/M2-LLM-yoda_sentences.csv"
+RAW_DATASET_URI: str = f"gs://{BUCKET_NAME}/dolly_pirate_simple_dataset.csv"
 PIPELINE_ROOT_PATH: str = f"{BUCKET_NAME}/vertexai-pipeline-root/"

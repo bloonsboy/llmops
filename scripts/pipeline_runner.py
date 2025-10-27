@@ -11,10 +11,9 @@ from src.pipelines.model_training_pipeline import model_training_pipeline
 
 if __name__ == "__main__":
     aiplatform.init(project=PROJECT_ID, location=REGION)
-
-    pipeline_name = "nathan_model_training_pipeline"
+    pipeline_name = "pirate-translator-pipeline"
     compiler.Compiler().compile(
-        pipeline_func=model_training_pipeline,  # type: ignore
+        pipeline_func=model_training_pipeline,
         package_path=f"{pipeline_name}.json",
     )
     job = aiplatform.PipelineJob(
