@@ -13,9 +13,7 @@ class EndpointHandler:
 
     def __init__(self, model_dir: str = MODEL_DIR) -> None:
         """Load tokenizer and model from the specified directory."""
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "microsoft/Phi-3-mini-4k-instruct"
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_dir, torch_dtype=torch.float16, device_map="cuda:0"
         ).eval()
