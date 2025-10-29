@@ -28,3 +28,11 @@ dist/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+*.json
+notebooks
+data
+.chainlit/
+.mypy_cache/
+.ruff_cache/
+.clinerules/
